@@ -1,8 +1,9 @@
 :root {
   color-scheme: light dark;
   --page: #0b0b0b;
-  --ink: #f5f5f2;
-  --muted: #b8b8b2;
+  --ink: #ecece6;
+  --muted: #b2b2aa;
+  --soft: #d8d8d0;
   --line: #f5f5f2;
 }
 
@@ -49,15 +50,15 @@ p {
 }
 
 h1 {
-  font-size: clamp(1.25rem, 6vw, 1.85rem);
-  font-weight: 600;
+  font-size: clamp(1.2rem, 5.5vw, 1.72rem);
+  font-weight: 500;
   line-height: 1.25;
 }
 
 .tagline {
-  margin-top: 10px;
+  margin-top: 9px;
   color: var(--muted);
-  font-size: clamp(0.78rem, 3.6vw, 0.92rem);
+  font-size: clamp(0.75rem, 3.4vw, 0.84rem);
   line-height: 1.5;
 }
 
@@ -66,9 +67,9 @@ h1 {
   flex-wrap: wrap;
   justify-content: center;
   gap: 14px;
-  margin-top: 22px;
+  margin-top: 21px;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
@@ -93,23 +94,24 @@ h1 {
 }
 
 .section-title {
-  margin-top: 42px;
-  color: var(--ink);
-  font-size: 0.82rem;
-  font-weight: 600;
+  margin-top: 40px;
+  color: var(--soft);
+  font-size: 0.78rem;
+  font-weight: 500;
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 5px;
+  text-decoration-color: var(--muted);
+  text-underline-offset: 4px;
 }
 
 .links {
   display: grid;
-  gap: 10px;
+  gap: 9px;
   padding: 0;
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   list-style: none;
   color: var(--muted);
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   line-height: 1.4;
 }
 
