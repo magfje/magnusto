@@ -38,7 +38,7 @@ a {
 }
 
 .card {
-  width: min(100%, 420px);
+  width: min(100%, 620px);
   padding: clamp(28px, 6vw, 48px);
   text-align: center;
 }
@@ -93,7 +93,7 @@ h1 {
 }
 
 .section-title {
-  margin-top: 30px;
+  margin-top: 42px;
   color: var(--ink);
   font-size: 0.82rem;
   font-weight: 600;
@@ -104,7 +104,7 @@ h1 {
   display: block;
   width: 42px;
   height: 1px;
-  margin: 9px auto 0;
+  margin: 7px auto 0;
   background: var(--muted);
 }
 
@@ -112,7 +112,7 @@ h1 {
   display: grid;
   gap: 10px;
   padding: 0;
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   list-style: none;
   color: var(--muted);
   font-size: 0.86rem;
