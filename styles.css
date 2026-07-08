@@ -97,15 +97,9 @@ h1 {
   color: var(--ink);
   font-size: 0.82rem;
   font-weight: 600;
-}
-
-.section-title::after {
-  content: "";
-  display: block;
-  width: 42px;
-  height: 1px;
-  margin: 7px auto 0;
-  background: var(--muted);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
 }
 
 .links {
