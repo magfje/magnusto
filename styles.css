@@ -63,12 +63,14 @@ h1 {
 
 .contact-links {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 14px;
   margin-top: 22px;
   color: var(--muted);
   font-size: 0.86rem;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .contact-links a {
