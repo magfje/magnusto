@@ -17,6 +17,8 @@
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
     <script src="./border.js" defer></script>
+    <script src="./text-intro.js" defer></script>
+    <script src="./debug.js" defer></script>
   </head>
   <body>
     <main class="shell" aria-label="personal links">
@@ -39,23 +41,60 @@
           <ul class="links" aria-label="things links">
             <li>
               <a href="https://font2svg.magnus.to/" aria-label="font2svg">
-                font2svg
+                [font2svg]
               </a>
             </li>
             <li>
               <a href="http://pdftools.magnus.to/" aria-label="pdftools">
-                pdftools
+                [pdftools]
               </a>
             </li>
-            <li><a href="https://rooo.no" aria-label="rooo.no">rooo.no</a></li>
+            <li><a href="https://rooo.no" aria-label="rooo.no">[rooo.no]</a></li>
             <li>
               <a href="https://slopball.magnus.to" aria-label="slopball">
-                slopball
+                [slopball]
               </a>
             </li>
           </ul>
         </div>
       </section>
     </main>
+
+    <form class="debug-menu" aria-label="debug menu" hidden>
+      <p>debug</p>
+      <label>
+        bg
+        <input type="color" name="bg" value="#16171b" />
+      </label>
+      <label>
+        text/border
+        <input type="color" name="ink" value="#b8b7ab" />
+      </label>
+      <label>
+        charset
+        <select name="charset">
+          <option value="blocks" selected>blocks</option>
+          <option value="code">code</option>
+          <option value="minimal">minimal</option>
+          <option value="custom">custom</option>
+        </select>
+      </label>
+      <label class="custom-charset-field" hidden>
+        chars
+        <input type="text" name="customCharset" value="" spellcheck="false" />
+      </label>
+      <label>
+        shape
+        <select name="shape">
+          <option value="box">box</option>
+          <option value="circle" selected>circle</option>
+        </select>
+      </label>
+      <label class="circle-thickness-field">
+        circle thick
+        <input type="number" name="circleThickness" value="60" min="6" max="80" step="1" />
+      </label>
+      <button type="button" name="copy">copy config</button>
+    </form>
   </body>
 </html>

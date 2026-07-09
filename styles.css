@@ -1,10 +1,10 @@
 :root {
   color-scheme: light dark;
-  --page: #0b0b0b;
-  --ink: #ecece6;
-  --muted: #b2b2aa;
-  --soft: #d8d8d0;
-  --line: #f5f5f2;
+  --page: #16171b;
+  --ink: #b8b7ab;
+  --muted: color-mix(in srgb, var(--ink) 68%, var(--page));
+  --soft: color-mix(in srgb, var(--ink) 84%, var(--page));
+  --line: var(--ink);
 }
 
 * {
@@ -43,23 +43,25 @@ a {
   width: min(calc(100vw - 48px), 520px);
   aspect-ratio: 4 / 5;
   text-align: center;
-  --particle-bleed: 160px;
 }
 
 .card-content {
   position: relative;
   z-index: 1;
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
   display: grid;
   align-content: center;
+  justify-items: center;
   padding: clamp(64px, 9vw, 88px) clamp(24px, 5vw, 38px);
 }
 
 .ascii-border {
-  position: absolute;
-  inset: calc(var(--particle-bleed) * -1);
-  width: auto;
-  height: auto;
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100vw;
+  height: 100dvh;
   pointer-events: none;
 }
 
@@ -86,6 +88,7 @@ h1 {
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
+  max-width: 100%;
   margin-top: 21px;
   color: var(--muted);
   font-size: clamp(0.68rem, 1.5vw, 0.72rem);
@@ -95,6 +98,7 @@ h1 {
 
 .contact-links a {
   display: inline-block;
+  min-width: 0;
   border-bottom: 1px solid transparent;
   transition:
     border-color 160ms ease,
@@ -104,7 +108,6 @@ h1 {
 
 .contact-links a:hover {
   color: var(--ink);
-  border-color: var(--ink);
 }
 
 .contact-links a:active,
@@ -116,11 +119,7 @@ h1 {
   margin-top: 40px;
   color: var(--soft);
   font-size: 0.78rem;
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-decoration-color: var(--muted);
-  text-underline-offset: 4px;
+  font-weight: 600;
 }
 
 .links {
@@ -145,13 +144,92 @@ h1 {
 
 .links a:hover {
   color: var(--ink);
-  border-color: var(--ink);
 }
 
 .contact-links a:focus-visible,
 .links a:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 4px;
+}
+
+.text-intro-running {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--ink) 18%, transparent);
+}
+
+.text-hover-active {
+  color: var(--ink);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--ink) 36%, transparent);
+}
+
+.debug-menu {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 5;
+  display: grid;
+  gap: 9px;
+  width: min(220px, calc(100vw - 32px));
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--ink) 26%, transparent);
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  color: var(--muted);
+  font: 0.72rem/1.35 "JetBrains Mono", ui-monospace, sfmono-regular, consolas, monospace;
+}
+
+.debug-menu[hidden] {
+  display: none;
+}
+
+.debug-menu [hidden] {
+  display: none;
+}
+
+.debug-menu p {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.debug-menu label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.debug-menu input,
+.debug-menu select,
+.debug-menu button {
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, var(--ink) 28%, transparent);
+  background: var(--page);
+  color: var(--ink);
+  font: inherit;
+}
+
+.debug-menu input[type="color"] {
+  width: 34px;
+  height: 24px;
+  padding: 0;
+}
+
+.debug-menu input[type="text"] {
+  width: 112px;
+  padding: 3px 5px;
+}
+
+.debug-menu input[type="number"] {
+  width: 112px;
+  padding: 3px 5px;
+}
+
+.debug-menu select {
+  width: 112px;
+  padding: 3px 5px;
+}
+
+.debug-menu button {
+  padding: 5px 7px;
+  cursor: pointer;
 }
 
 @media (prefers-reduced-motion: reduce) {
