@@ -39,9 +39,19 @@ a {
 }
 
 .card {
-  width: min(100%, 620px);
-  padding: clamp(28px, 6vw, 48px);
+  position: relative;
+  width: fit-content;
+  max-width: calc(100vw - 48px);
+  padding: clamp(54px, 8vw, 76px) clamp(28px, 6vw, 56px);
   text-align: center;
+}
+
+.ascii-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 h1,
