@@ -1,7 +1,8 @@
 (function () {
   const canvas = document.querySelector(".ascii-border");
   const card = document.querySelector(".card");
-  if (!canvas || !card) return;
+  const content = document.querySelector(".card-content");
+  if (!canvas || !card || !content) return;
 
   const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) return;
@@ -14,19 +15,19 @@
   let raf = 0;
   let lastWidth = 0;
   let lastHeight = 0;
+  let lastDpr = 0;
 
   function resize() {
     const rect = card.getBoundingClientRect();
     dpr = window.devicePixelRatio || 1;
     width = Math.max(1, Math.round(rect.width));
     height = Math.max(1, Math.round(rect.height));
-    if (width === lastWidth && height === lastHeight) return;
+    if (width === lastWidth && height === lastHeight && dpr === lastDpr) return;
     lastWidth = width;
     lastHeight = height;
+    lastDpr = dpr;
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
@@ -86,7 +87,7 @@
 
   if ("ResizeObserver" in window) {
     const observer = new ResizeObserver(start);
-    observer.observe(card);
+    observer.observe(content);
   }
 
   if (document.fonts && document.fonts.ready) {

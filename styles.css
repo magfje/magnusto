@@ -42,8 +42,13 @@ a {
   position: relative;
   width: fit-content;
   max-width: calc(100vw - 48px);
-  padding: clamp(54px, 8vw, 76px) clamp(28px, 6vw, 56px);
   text-align: center;
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+  padding: clamp(54px, 8vw, 76px) clamp(28px, 6vw, 56px);
 }
 
 .ascii-border {
