@@ -40,22 +40,26 @@ a {
 
 .card {
   position: relative;
-  width: fit-content;
-  max-width: calc(100vw - 48px);
+  width: min(calc(100vw - 48px), 520px);
+  aspect-ratio: 4 / 5;
   text-align: center;
+  --particle-bleed: 160px;
 }
 
 .card-content {
   position: relative;
   z-index: 1;
-  padding: clamp(54px, 8vw, 76px) clamp(28px, 6vw, 56px);
+  min-height: 100%;
+  display: grid;
+  align-content: center;
+  padding: clamp(64px, 9vw, 88px) clamp(24px, 5vw, 38px);
 }
 
 .ascii-border {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: calc(var(--particle-bleed) * -1);
+  width: auto;
+  height: auto;
   pointer-events: none;
 }
 
@@ -81,10 +85,10 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
   margin-top: 21px;
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: clamp(0.68rem, 1.5vw, 0.72rem);
   line-height: 1.4;
   overflow-wrap: anywhere;
 }

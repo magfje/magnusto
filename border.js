@@ -17,13 +17,16 @@
     noiseAmount: 0.14,
     borderPad: 12,
     borderThickness: 24,
+    particleBleed: 160,
   };
-  const ramp = " .-+x#";
+  const ramp = " ░▒▓█";
   const bootChars = "01{}[]<>/\\|!@#$%&*:;=+-_~";
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   let width = 0;
   let height = 0;
+  let cardWidth = 0;
+  let cardHeight = 0;
   let dpr = 1;
   let raf = 0;
   let lastWidth = 0;
@@ -43,8 +46,10 @@
   function init() {
     const rect = card.getBoundingClientRect();
     dpr = window.devicePixelRatio || 1;
-    width = Math.max(1, Math.round(rect.width));
-    height = Math.max(1, Math.round(rect.height));
+    cardWidth = Math.max(1, Math.round(rect.width));
+    cardHeight = Math.max(1, Math.round(rect.height));
+    width = cardWidth + config.particleBleed * 2;
+    height = cardHeight + config.particleBleed * 2;
 
     if (width !== lastWidth || height !== lastHeight || dpr !== lastDpr) {
       canvas.width = Math.round(width * dpr);
@@ -66,10 +71,10 @@
 
     const cell = config.cellSize;
     const rowH = cell * 1.45;
-    const pad = config.borderPad;
+    const pad = config.particleBleed + config.borderPad;
     const thickness = config.borderThickness;
-    const right = width - pad;
-    const bottom = height - pad;
+    const right = config.particleBleed + cardWidth - config.borderPad;
+    const bottom = config.particleBleed + cardHeight - config.borderPad;
 
     let minCol = Infinity;
     let maxCol = -Infinity;
@@ -186,7 +191,7 @@
         char = bootChars[(cell.col * 7 + cell.row * 13 + ((time * 12) | 0)) % bootChars.length];
       }
 
-      const alpha = (0.18 + brightness * 0.65 + mouseInf * 0.25) * cell.edgeFactor * progress;
+      const alpha = (0.12 + brightness * 0.48 + mouseInf * 0.25) * cell.edgeFactor * progress;
       ctx.fillStyle = `rgba(255,255,255,${Math.min(alpha, 0.96).toFixed(3)})`;
       ctx.fillText(char, cell.x, cell.y);
     }
@@ -220,7 +225,7 @@
       const angle = dir + spread;
       const speed = velocity.speed * (0.055 + Math.random() * 0.14) / Math.sqrt(mass);
       const char = ramp[Math.max(1, Math.floor(cell.density * (ramp.length - 1)))];
-      const life = 0.9 + Math.random() * 1.1 + mass * 0.25;
+      const life = 1.8 + Math.random() * 1.6 + mass * 0.45;
 
       cell.tornUntil = timestamp + life * 1000;
       flying.push({
@@ -269,7 +274,7 @@
       f.scaleY = Math.cos(elapsed * f.flipSpeed + f.tumblePhase);
       f.life -= dt;
 
-      if (f.life <= 0 || f.x < -160 || f.x > width + 160 || f.y > height + 180) continue;
+      if (f.life <= 0 || f.x < -80 || f.x > width + 80 || f.y > height + 100) continue;
 
       const alphaBase = f.life / f.maxLife;
       const alpha = alphaBase < 0.35 ? (alphaBase / 0.35) * (alphaBase / 0.35) : 1;
@@ -278,7 +283,7 @@
 
       ctx.save();
       ctx.transform(cos, sin * f.scaleY, -sin, cos * f.scaleY, f.x, f.y);
-      ctx.fillStyle = `rgba(255,255,255,${(alpha * 0.82).toFixed(3)})`;
+      ctx.fillStyle = `rgba(255,255,255,${(alpha * 0.74).toFixed(3)})`;
       ctx.fillText(f.char, 0, 0);
       ctx.restore();
 
@@ -311,7 +316,10 @@
 
   function pointerFromEvent(event) {
     const rect = card.getBoundingClientRect();
-    updatePointer(event.clientX - rect.left, event.clientY - rect.top);
+    updatePointer(
+      event.clientX - rect.left + config.particleBleed,
+      event.clientY - rect.top + config.particleBleed
+    );
   }
 
   function clearPointer() {
@@ -334,7 +342,7 @@
 
   if ("ResizeObserver" in window) {
     const observer = new ResizeObserver(start);
-    observer.observe(content);
+    observer.observe(card);
   }
 
   if (document.fonts && document.fonts.ready) {
@@ -348,13 +356,19 @@
   card.addEventListener("touchstart", (event) => {
     if (event.touches[0]) {
       const rect = card.getBoundingClientRect();
-      updatePointer(event.touches[0].clientX - rect.left, event.touches[0].clientY - rect.top);
+      updatePointer(
+        event.touches[0].clientX - rect.left + config.particleBleed,
+        event.touches[0].clientY - rect.top + config.particleBleed
+      );
     }
   }, { passive: true });
   card.addEventListener("touchmove", (event) => {
     if (event.touches[0]) {
       const rect = card.getBoundingClientRect();
-      updatePointer(event.touches[0].clientX - rect.left, event.touches[0].clientY - rect.top);
+      updatePointer(
+        event.touches[0].clientX - rect.left + config.particleBleed,
+        event.touches[0].clientY - rect.top + config.particleBleed
+      );
     }
   }, { passive: true });
 
