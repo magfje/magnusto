@@ -38,6 +38,8 @@
   };
 
   const MAX_FLYING = 250;
+  const BASE_CARD_WIDTH = 520;
+  const BASE_CARD_HEIGHT = 650;
   const bootChars = "01{}[]<>/\\|!@#$%&*:;=+-_~";
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -50,6 +52,7 @@
   let startTime = null;
   let initialized = false;
   let resizeObserved = false;
+  let renderScale = 1;
   let bounds = { minCol: 0, maxCol: 1, minRow: 0, maxRow: 1 };
 
   const mouse = { x: -9999, y: -9999 };
@@ -63,6 +66,10 @@
   function init() {
     const canvasRect = canvas.getBoundingClientRect();
     const rect = card.getBoundingClientRect();
+    renderScale = Math.max(
+      0.65,
+      Math.min(1, rect.width / BASE_CARD_WIDTH, rect.height / BASE_CARD_HEIGHT)
+    );
     dpr = window.devicePixelRatio || 1;
     width = Math.max(1, Math.round(canvasRect.width));
     height = Math.max(1, Math.round(canvasRect.height));
@@ -98,7 +105,7 @@
   function buildBoxGrid() {
     cells.length = 0;
 
-    const charSize = config.cellSize;
+    const charSize = scaled(config.cellSize);
     const rowH = charSize * 1.6;
     const halfChar = charSize / 2;
     const baselineOffset = charSize * 0.8;
@@ -152,14 +159,17 @@
   function buildCircleGrid() {
     cells.length = 0;
 
-    const charSize = config.cellSize;
+    const charSize = scaled(config.cellSize);
     const rowH = charSize * 1.6;
     const halfChar = charSize / 2;
     const baselineOffset = charSize * 0.8;
     const centerX = (cardRect.left + cardRect.right) / 2;
     const centerY = (cardRect.top + cardRect.bottom) / 2;
-    const thickness = config.circleThickness;
-    const desiredRadius = Math.max(cardRect.right - cardRect.left, cardRect.bottom - cardRect.top) / 2 + config.frameOutset;
+    const thickness = scaled(config.circleThickness);
+    const desiredRadius = (
+      Math.max(cardRect.right - cardRect.left, cardRect.bottom - cardRect.top) / 2
+      + scaled(config.frameOutset)
+    );
     const viewportMargin = 18;
     const maxRadius = Math.max(
       thickness,
@@ -214,10 +224,10 @@
 
   function createBoxFrame(rect) {
     const outer = {
-      left: rect.left - config.frameOutset,
-      top: rect.top - config.frameOutset,
-      right: rect.right + config.frameOutset,
-      bottom: rect.bottom + config.frameOutset,
+      left: rect.left - scaled(config.frameOutset),
+      top: rect.top - scaled(config.frameOutset),
+      right: rect.right + scaled(config.frameOutset),
+      bottom: rect.bottom + scaled(config.frameOutset),
     };
 
     return { outer };
@@ -231,10 +241,10 @@
     lastFrame = timestamp;
 
     const time = timestamp * 0.001 * config.speed;
-    const charSize = config.cellSize;
     const ramp = getRamp();
     const rampLen = ramp.length;
-    const mouseRadSq = config.mouseRadius * config.mouseRadius;
+    const mouseRadius = scaled(config.mouseRadius);
+    const mouseRadSq = mouseRadius * mouseRadius;
 
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -246,6 +256,7 @@
       return;
     }
 
+    decayVelocity(dt);
     spawnFlying(timestamp, time, ramp, rampLen, mouseRadSq);
     updateSnakes(time);
     drawFlying(dt);
@@ -286,11 +297,12 @@
       const distSq = dx * dx + dy * dy;
       if (distSq > mouseRadSq) continue;
 
-      const distNorm = Math.sqrt(distSq) / config.mouseRadius;
+      const distNorm = Math.sqrt(distSq) / scaled(config.mouseRadius);
       if (Math.random() > (1 - distNorm) * 0.7) continue;
 
       const renderState = getCellRenderState(cell, timestamp, time, ramp, rampLen, mouseRadSq);
       if (!renderState || renderState.char === " ") continue;
+      const displayChar = getDisplayChar(cell, renderState, time, true);
 
       const mass = 0.5 + Math.random() * 1.5;
       const spreadAngle = (1.2 / mass) * (Math.random() - 0.5);
@@ -308,14 +320,14 @@
         y: cell.y,
         vx: Math.cos(angle) * magnitude + Math.cos(perpAngle) * perpMag,
         vy: Math.sin(angle) * magnitude + Math.sin(perpAngle) * perpMag - 30 * (1 / mass),
-        char: renderState.displayChar,
+        char: displayChar,
         r: renderState.color.r,
         g: renderState.color.g,
         b: renderState.color.b,
         releaseAlpha: renderState.alpha,
         life: lifespan,
         maxLife: lifespan,
-        size: config.cellSize,
+        size: scaled(config.cellSize),
         rotation: (Math.random() - 0.5) * 0.3,
         rotSpeed: (Math.random() - 0.5) * (8 / mass),
         cellIdx: i,
@@ -333,7 +345,7 @@
   function drawFlying(dt) {
     const baseGravity = 280;
 
-    ctx.font = `${config.cellSize}px monospace`;
+    ctx.font = `${scaled(config.cellSize)}px monospace`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -395,7 +407,7 @@
     const colRange = Math.max(1, bounds.maxCol - bounds.minCol);
     const rowRange = Math.max(1, bounds.maxRow - bounds.minRow);
 
-    ctx.font = `${config.cellSize}px monospace`;
+    ctx.font = `${scaled(config.cellSize)}px monospace`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
@@ -415,16 +427,13 @@
       const introAlpha = visibleProgress * visibleProgress * (3 - 2 * visibleProgress);
       const renderState = getCellRenderState(cell, timestamp, time, ramp, rampLen, mouseRadSq);
       if (!renderState || renderState.char === " ") continue;
-      let displayChar = renderState.char;
+      const displayChar = getDisplayChar(cell, renderState, time, isSettled);
       let alpha = renderState.alpha;
 
       if (!isSettled) {
         alpha *= introAlpha;
-      } else if (renderState.mouseInf > 0.3 && renderState.flicker < 0.3) {
-        displayChar = bootChars[(cell.col * 7 + cell.row * 13 + ((time * 12) | 0)) % bootChars.length];
       }
 
-      renderState.displayChar = displayChar;
       renderState.alpha = alpha;
       const color = renderState.color;
       const glow = Math.max(renderState.mouseInf, renderState.snake * 0.55);
@@ -441,11 +450,21 @@
     ctx.shadowBlur = 0;
   }
 
+  function getDisplayChar(cell, renderState, time, allowScramble) {
+    if (allowScramble && renderState.mouseInf > 0.3 && renderState.flicker < 0.3) {
+      return bootChars[
+        (cell.col * 7 + cell.row * 13 + ((time * 12) | 0)) % bootChars.length
+      ];
+    }
+
+    return renderState.char;
+  }
+
   function getCellRenderState(cell, timestamp, time, ramp, rampLen, mouseRadSq) {
     const dx = cell.x - mouse.x;
     const dy = cell.y - mouse.y;
     const distSq = dx * dx + dy * dy;
-    const mouseInf = distSq < mouseRadSq ? Math.max(0, 1 - Math.sqrt(distSq) / config.mouseRadius) : 0;
+    const mouseInf = distSq < mouseRadSq ? Math.max(0, 1 - Math.sqrt(distSq) / scaled(config.mouseRadius)) : 0;
     const wavePhase = getWave(cell, time);
     let brightness = getBrightness(cell, wavePhase, mouseInf);
     const flickerSeed = Math.sin(
@@ -477,7 +496,6 @@
 
     return {
       char,
-      displayChar: char,
       alpha,
       color,
       brightness,
@@ -612,7 +630,14 @@
 
   function getEffectiveShape() {
     if (config.forceShape) return config.shape;
-    return window.innerWidth <= config.mobileBreakpoint ? config.mobileShape : config.shape;
+    const isShortLandscape = window.innerWidth > window.innerHeight && window.innerHeight <= 560;
+    return window.innerWidth <= config.mobileBreakpoint || isShortLandscape
+      ? config.mobileShape
+      : config.shape;
+  }
+
+  function scaled(value) {
+    return value * renderScale;
   }
 
   function getWave(cell, time) {
@@ -668,7 +693,7 @@
 
     const count = (config.noiseAmount * 40) | 0;
     const timeSlot = (time * 3) | 0;
-    ctx.font = `${config.cellSize * 0.8}px monospace`;
+    ctx.font = `${scaled(config.cellSize) * 0.8}px monospace`;
     ctx.fillStyle = "rgba(160,170,190,0.04)";
 
     for (let i = 0; i < count; i++) {
@@ -705,6 +730,21 @@
     mouse.y = y;
 
     if (reduceMotion.matches) animate(now);
+  }
+
+  function decayVelocity(dt) {
+    if (velocity.speed === 0) return;
+
+    const decay = Math.exp(-6 * dt);
+    velocity.vx *= decay;
+    velocity.vy *= decay;
+    velocity.speed = Math.hypot(velocity.vx, velocity.vy);
+
+    if (velocity.speed < 5) {
+      velocity.vx = 0;
+      velocity.vy = 0;
+      velocity.speed = 0;
+    }
   }
 
   function pointerFromEvent(event) {
@@ -785,6 +825,8 @@
   window.addEventListener("mouseleave", clearPointer);
   window.addEventListener("touchstart", touchFromEvent, { passive: true });
   window.addEventListener("touchmove", touchFromEvent, { passive: true });
+  window.addEventListener("touchend", clearPointer, { passive: true });
+  window.addEventListener("touchcancel", clearPointer, { passive: true });
 
   start();
 })();

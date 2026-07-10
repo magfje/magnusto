@@ -99,7 +99,9 @@
     if (customCharset) customCharsetInput.value = customCharset;
     if (shape && shapeInput.querySelector(`option[value="${CSS.escape(shape)}"]`)) {
       shapeInput.value = shape;
-    } else if (window.matchMedia("(max-width: 640px)").matches) {
+    } else if (window.matchMedia(
+      "(max-width: 640px), (orientation: landscape) and (max-height: 560px)"
+    ).matches) {
       shapeInput.value = "box";
     }
     if (circleThickness) circleThicknessInput.value = circleThickness;
